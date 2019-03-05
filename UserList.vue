@@ -42,14 +42,17 @@ export default {
     }
   },
   mounted () {
-    this.getUserList({})
+    this.getUserList('')
   },
   methods: {
-    getUserList (param) {
+    getUserList (name) {
       let token = 'eyJjdHkiOiJKV1QiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0IiwiYWxnIjoiZGlyIn0..-FbAnP9QA9uRzv-9Qptn8g.NhMKnXW6BAsXUxOlbEzcmdalxct5XUy1A-YE97HgoYwAfD8bt9CUweTaW9kW2KI92XfQAiFsLiF1x_zGhe7NQ2-L1Aq1ZSdDzA3iN9yt3ztBIbkVw0lKmB2TOAgFx2pFulTnfss4kLH9mAT6t_h9FOjwMbVtD1tBLJJ9lB24tR8JtmtN2-p1ZckX75zlc5hmGkvB6KwuHa47ofLAn_ScvrB91rPpljgBgRjV3KnrSqs.MJKY-AI0TAd28SetQVfaIjwtjX4ZmfJB'
 
       var xhr = new XMLHttpRequest()
       var url = 'http://10.12.20.36:28091/auth-service/v1/users?page=1&size=10000'
+      if (name) {
+        url = url + `&username=${name}`
+      }
 
       xhr.open('GET', url, true)
       xhr.setRequestHeader('K2_KEY', token)
@@ -61,14 +64,12 @@ export default {
           }
         }
       }
-      xhr.send(param)
+      xhr.send(null)
     },
     onSearch () {
-      let params = { userName: this.searchUserName }
-      this.getUserList(params)
+      this.getUserList(this.searchUserName)
     },
     clickUser (username) {
-      // this.userName=username;
       console.log(username)
     },
     showUserInfo (item) {
@@ -76,7 +77,7 @@ export default {
       var username = item.username
       var tenantId = item.tenantId
       var email = item.email
-      var content = `<table class="detail-modal-table">
+      var content = `<table>
               <tr>
                 <td>用户名</td>
                 <td>&nbsp;:&nbsp;</td>
@@ -98,7 +99,7 @@ export default {
                <td>${userCreatedDate}</td>
               </tr>
             </table>`
-      Modal.info({ title: '用户信息查看', content: content })
+      Modal.info({ title: '用户信息查看', content: content, closable: true })
     },
     formatDate (dateObj) {
       if (dateObj && typeof dateObj === 'object') {
