@@ -1,5 +1,5 @@
 <template>
-  <div class="tree-wrapper">
+  <div class="tree-wrapper" style="width:200px;text-align:left">
     <i-input
       placeholder="搜索用户"
       style="width: 90%"
@@ -7,10 +7,6 @@
       v-model="searchUserName"
       @on-click="onSearch" />
     <div style="width: 100%;padding-top: 8px" class="demo-spin-article">
-      <i-spin
-        size="large"
-        fix
-        v-if="spinShow"></i-spin>
       <div
         :value="item.username"
         style="margin-top: 6px;"
@@ -21,7 +17,7 @@
         </i-button>
         <div style="float: right;margin-top: 10px">
           <i-tooltip content="点击查看用户信息" placement="left-start">
-            <i-icon type="md-menu" @click.native="clickUserInfo(item)" />
+            <i-icon type="md-menu" @click.native="showUserInfo(item)" />
           </i-tooltip>
         </div>
       </div>
@@ -29,23 +25,28 @@
   </div>
 </template>
 <script>
-import { Button, Input, Spin, Icon, Tooltip } from 'iview'
+import { Button, Input, Icon, Tooltip, Modal } from 'iview'
 
 export default {
   name: 'UserList',
   components: {
     'i-button': Button,
     'i-input': Input,
-    'i-spin': Spin,
     'i-icon': Icon,
     'i-tooltip': Tooltip
+  },
+  data () {
+    return {
+      userList: '',
+      searchUserName: ''
+    }
   },
   mounted () {
     this.getUserList({})
   },
   methods: {
     getUserList (param) {
-      let token = 'eyJjdHkiOiJKV1QiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0IiwiYWxnIjoiZGlyIn0..DKInRzSv705fETH7equI1Q.Je2FVCpN_G2umkeLSexnmpTQZz2TWfOhLgG39iYspF1vyQfq3xtvXBxRCPdrQhN4MLPLEXRTlPx1cbDsuu0o9DA7DbwiU82x2ojTgFCVy5HvRi_uKtJW_2nAetFUopoi-EmYPhI44xrITztR_aE0x83Em95ijchagmCu012uBqZdv9nKht3DFsUIMvF4CSLFJMa0tFE274D1yQI_456_5ixhCb7-NggOrJ5Z_0w2BwPl4hyncLpH_i33KdQKoiGvD-E1EtbAsKq007Gk0N6pkQ.APvHmLOA3uFkJAL3wnZba8o5vJTds0zL'
+      let token = 'eyJjdHkiOiJKV1QiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0IiwiYWxnIjoiZGlyIn0..-FbAnP9QA9uRzv-9Qptn8g.NhMKnXW6BAsXUxOlbEzcmdalxct5XUy1A-YE97HgoYwAfD8bt9CUweTaW9kW2KI92XfQAiFsLiF1x_zGhe7NQ2-L1Aq1ZSdDzA3iN9yt3ztBIbkVw0lKmB2TOAgFx2pFulTnfss4kLH9mAT6t_h9FOjwMbVtD1tBLJJ9lB24tR8JtmtN2-p1ZckX75zlc5hmGkvB6KwuHa47ofLAn_ScvrB91rPpljgBgRjV3KnrSqs.MJKY-AI0TAd28SetQVfaIjwtjX4ZmfJB'
 
       var xhr = new XMLHttpRequest()
       var url = 'http://10.12.20.36:28091/auth-service/v1/users?page=1&size=10000'
@@ -57,41 +58,47 @@ export default {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
             this.userList = JSON.parse(xhr.responseText).result
-            return JSON.parse(xhr.responseText).result
           }
         }
       }
       xhr.send(param)
     },
-    getUserInfo () {
-      let params = {}
-      this.getUserList(params).then(data => {
-        this.userList = data
-        this.spinShow = !this.spinShow
-      })
-    },
     onSearch () {
-      this.spinShow = !this.spinShow
       let params = { userName: this.searchUserName }
-      this.getUserList(params).then(data => {
-        this.userList = data
-        this.spinShow = !this.spinShow
-      })
+      this.getUserList(params)
     },
     clickUser (username) {
       // this.userName=username;
       console.log(username)
     },
-    clickUserInfo (item) {
-      let info = [
-        { label: '用户名', value: item.username },
-        { label: '用户ID', value: item.id },
-        { label: '创建时间', value: this.formatDate(new Date(item.createTime)) },
-        { label: '租户ID', value: item.tenantId },
-        { label: '邮箱', value: item.email }
-      ]
-      this.userInfo = item
-      this.$detail('用户信息查看', info)
+    showUserInfo (item) {
+      var userCreatedDate = this.formatDate(new Date(item.createTime))
+      var username = item.username
+      var tenantId = item.tenantId
+      var email = item.email
+      var content = `<table class="detail-modal-table">
+              <tr>
+                <td>用户名</td>
+                <td>&nbsp;:&nbsp;</td>
+                <td>${username}</td>
+              </tr>
+              <tr>
+                <td>租户ID</td>
+                <td>&nbsp;:&nbsp;</td>
+                <td>${tenantId}</td>
+              </tr>
+              <tr>
+                <td>邮箱</td>
+                <td>&nbsp;:&nbsp;</td>
+                <td>${email}</td>
+              </tr>
+              <tr>
+                <td>创建时间</td>
+                <td>&nbsp;:&nbsp;</td>
+               <td>${userCreatedDate}</td>
+              </tr>
+            </table>`
+      Modal.info({ title: '用户信息查看', content: content })
     },
     formatDate (dateObj) {
       if (dateObj && typeof dateObj === 'object') {
@@ -111,7 +118,6 @@ export default {
         return ''
       }
     }
-
   }
 }
 </script>
