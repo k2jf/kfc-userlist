@@ -12,7 +12,7 @@
         style="margin-top: 6px;"
         v-for="item in userList"
         :key="item.username">
-        <i-button type="text" @click.native="clickUser(item.username)">
+        <i-button type="text" @click="clickUser(item)">
           {{ item.username }}
         </i-button>
         <div style="float: right;margin-top: 10px">
@@ -38,6 +38,7 @@ export default {
   data () {
     return {
       userList: '',
+
       searchUserName: ''
     }
   },
@@ -69,8 +70,8 @@ export default {
     onSearch () {
       this.getUserList(this.searchUserName)
     },
-    clickUser (username) {
-      console.log(username)
+    clickUser (item) {
+      this.$emit('on-click-user', item)
     },
     showUserInfo (item) {
       var userCreatedDate = this.formatDate(new Date(item.createTime))
