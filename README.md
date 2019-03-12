@@ -1,11 +1,14 @@
 # kfc-userlist
 获取用户列表
+用户列表带搜索，不区分大小写，改变即搜索。搜索不会再次调用后台接口。
 
 # git 相关
 ```
 # 初次clone
 git remote add -f kfc-userlist git@github.com:k2jf/kfc-userlist.git
 git subtree add -P src/components/kfc-userlist kfc-userlist master --squash
+or
+git subtree add -P src/components/kfc-userlist git@github.com:k2jf/kfc-userlist.git master --squash
 
 # pull
 git subtree pull -P src/components/kfc-userlist kfc-userlist master --squash
@@ -14,6 +17,7 @@ git subtree pull -P src/components/kfc-userlist kfc-userlist master --squash
 git subtree push -P src/components/kfc-userlist kfc-userlist master
 
 ```
+
 # 属性
 | 属性                    | 说明                           | 类型                 | 默认值        |
 | ----------------------- | ------------------------------ | -------------------- | ------------- |
@@ -32,15 +36,9 @@ export default {
   components: { 
     UserList
   },
-  data(){
-    return {
-      userInfo:''
-    }
-  },
   methods:{
     clickUser(item){
-      this.userInfo = item
-      alert(this.userInfo.username)
+      alert(item.username)
     }
   }
 

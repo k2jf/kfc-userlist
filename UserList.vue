@@ -15,7 +15,7 @@
         <i-button type="text" @click="clickUser(item)">
           {{ item.username }}
         </i-button>
-        <div style="float: right;margin-top: 10px">
+        <div style="float: right;">
           <i-tooltip content="点击查看用户信息" placement="left-start">
             <i-icon type="md-menu" @click.native="showUserInfo(item)" />
           </i-tooltip>
@@ -38,8 +38,13 @@ export default {
   data () {
     return {
       userList: '',
-
+      userListBk: '',
       searchUserName: ''
+    }
+  },
+  watch: { // 设置监听，当search内容发生改变时触发
+    searchUserName: function (newName, oldName) {
+      this.onSearch(newName)
     }
   },
   mounted () {
@@ -61,14 +66,24 @@ export default {
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
-            this.userList = JSON.parse(xhr.responseText).result
+            this.userListBk = JSON.parse(xhr.responseText).result
+            this.userList = this.userListBk
           }
         }
       }
       xhr.send(null)
     },
     onSearch () {
-      this.getUserList(this.searchUserName)
+      // this.getUserList(this.searchUserName) //调用接口
+      // 不调用接口，使用js处理
+      var key = this.searchUserName.toLowerCase()
+      if (key) {
+        this.userList = this.userListBk.filter(function (item) {
+          return item.username.toLowerCase().indexOf(key) !== -1
+        })
+      } else { // 当search内容为空时，返回全部列表
+        this.userList = this.userListBk
+      }
     },
     clickUser (item) {
       this.$emit('on-click-user', item)
